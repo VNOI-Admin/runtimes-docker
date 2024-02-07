@@ -7,8 +7,6 @@ on:
 jobs:
   amd64:
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
     steps:
       - uses: actions/checkout@v4
       - name: Build tier 1 Docker image
@@ -27,9 +25,9 @@ jobs:
         if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/master'
         run: |
           echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
-          docker push dmoj/runtimes-tier1:amd64-latest
-          docker push dmoj/runtimes-tier2:amd64-latest
-          docker push dmoj/runtimes-tier3:amd64-latest
+          docker push vnoj/runtimes-tier1:amd64-latest
+          docker push vnoj/runtimes-tier2:amd64-latest
+          docker push vnoj/runtimes-tier3:amd64-latest
           docker run -v "$(pwd)":/code mplatform/manifest-tool \
             --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD" \
             push from-spec /code/tier1/manifest.yml
@@ -42,49 +40,3 @@ jobs:
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Push images to GitHub Containers
-        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/master'
-        run: |
-          echo "$GITHUB_TOKEN" | docker login ghcr.io -u $ --password-stdin
-          docker push ghcr.io/dmoj/runtimes-tier1:amd64-latest
-          docker push ghcr.io/dmoj/runtimes-tier2:amd64-latest
-          docker push ghcr.io/dmoj/runtimes-tier3:amd64-latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  arm64:
-    runs-on: [self-hosted, Linux, ARM64]
-    permissions:
-      packages: write
-    steps:
-      - uses: actions/checkout@v4
-      - name: Build tier 1 Docker image
-        run: make TAG=aarch64-latest image-tier1
-      - name: Test tier 1 Docker image
-        run: make TAG=aarch64-latest test-tier1
-      - name: Build tier 2 Docker image
-        run: make TAG=aarch64-latest image-tier2
-      - name: Test tier 2 Docker image
-        run: make TAG=aarch64-latest test-tier2
-      - name: Build tier 3 Docker image
-        run: make TAG=aarch64-latest image-tier3
-      - name: Test tier 3 Docker image
-        run: make TAG=aarch64-latest test-tier3
-      - name: Push images to Docker
-        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/master'
-        run: |
-          echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
-          docker push dmoj/runtimes-tier1:aarch64-latest
-          docker push dmoj/runtimes-tier2:aarch64-latest
-          docker push dmoj/runtimes-tier3:aarch64-latest
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Push images to GitHub Containers
-        if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/master'
-        run: |
-          echo "$GITHUB_TOKEN" | docker login ghcr.io -u $ --password-stdin
-          docker push ghcr.io/dmoj/runtimes-tier1:aarch64-latest
-          docker push ghcr.io/dmoj/runtimes-tier2:aarch64-latest
-          docker push ghcr.io/dmoj/runtimes-tier3:aarch64-latest
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
