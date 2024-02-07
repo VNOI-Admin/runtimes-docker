@@ -1,4 +1,4 @@
-FROM dmoj/runtimes-tier1
+FROM vnoj/runtimes-tier1
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
