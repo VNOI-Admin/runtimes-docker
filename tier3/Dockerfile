@@ -1,4 +1,4 @@
-FROM dmoj/runtimes-tier2
+FROM vnoj/runtimes-tier2
 
 ARG KOTLIN_ZIP_URL
 ARG LEAN4_ZIP_URL

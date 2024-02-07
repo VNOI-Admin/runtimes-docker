@@ -1,4 +1,4 @@
-FROM dmoj/runtimes-tier1
+FROM vnoj/runtimes-tier1
 
 ARG SCALA_ZIP_URL
 
@@ -27,10 +27,10 @@ RUN apt-get update && \
     runuser judge -c 'curl https://sh.rustup.rs -sSf | sh -s -- -y' && \
         mkdir rust && ( \
             cd rust && \
-            curl -sL https://raw.githubusercontent.com/DMOJ/judge-server/master/dmoj/executors/RUST.py | \
+            curl -sL https://raw.githubusercontent.com/VNOI-Admin/judge-server/master/dmoj/executors/RUST.py | \
                 sed '/^CARGO_TOML/,/^"""/!d;//d' > Cargo.toml && \
             mkdir src && \
-            curl -sL https://raw.githubusercontent.com/DMOJ/judge-server/master/dmoj/executors/RUST.py | \
+            curl -sL https://raw.githubusercontent.com/VNOI-Admin/judge-server/master/dmoj/executors/RUST.py | \
                 sed '/^TEST_PROGRAM/,/^"""/!d;//d' > src/main.rs && \
             chown -R judge: . && \
             runuser -u judge /home/judge/.cargo/bin/cargo fetch \
