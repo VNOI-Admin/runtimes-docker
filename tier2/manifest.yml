@@ -1,12 +1,12 @@
-image: dmoj/runtimes-tier2:latest
+image: vnoj/runtimes-tier2:latest
 manifests:
   -
-    image: dmoj/runtimes-tier2:amd64-latest
+    image: vnoj/runtimes-tier2:amd64-latest
     platform:
       architecture: amd64
       os: linux
   -
-    image: dmoj/runtimes-tier2:aarch64-latest
+    image: vnoj/runtimes-tier2:aarch64-latest
     platform:
       architecture: arm64
       os: linux
