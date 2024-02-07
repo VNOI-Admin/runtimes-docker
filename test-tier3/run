@@ -1,7 +1,19 @@
 #!/bin/bash
+
+curl --location -o scratch-run.zip $(curl -s https://api.github.com/repos/VNOI-Admin/scratch-run/releases/latest | grep -o -m 1 "https://github\.com.*.*linux_amd64\.zip")
+unzip scratch-run.zip
+mv scratch-run /usr/bin/scratch-run
+
 mkdir /judge
 cd /judge || exit
 curl -L https://github.com/VNOI-Admin/judge-server/archive/master.tar.gz | tar -xz --strip-components=1
+
+mkdir -p /usr/lib/fpc/
+cp asset/Windows.pas /usr/lib/fpc/
+fpc -Fe/dev/stderr -O2 /usr/lib/fpc/Windows.pas
+
+.docker/download_testlib_and_precompile
+
 python3 -m venv --prompt=DMOJ env
 env/bin/pip3 install -e .
 runuser -u judge -w PATH -- bash -c '. ~/.profile; /judge/env/bin/python3 -u .docker.test.py'
