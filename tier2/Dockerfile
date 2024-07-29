@@ -2,7 +2,7 @@ FROM vnoj/runtimes-tier1
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        jq apt-transport-https dirmngr gnupg ca-certificates xz-utils \
+        jq apt-transport-https dirmngr gnupg ca-certificates xz-utils pkg-config \
         $([ "$(arch)" = x86_64 ] && echo libc6-dev-i386) \
         openjdk-22-jdk-headless clang llvm ghc golang racket ruby scala nasm chicken-bin && \
     ( export OPAMYES=1 OPAMJOBS=$(($(nproc) + 2)); \
