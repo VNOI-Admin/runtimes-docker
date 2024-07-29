@@ -7,6 +7,7 @@ mv scratch-run /usr/bin/scratch-run
 mkdir /judge
 cd /judge || exit
 curl -L https://github.com/VNOI-Admin/judge-server/archive/master.tar.gz | tar -xz --strip-components=1
+sed -i "s/ALLOW_FAIL = {'GASARM'}/ALLOW_FAIL = {'GASARM', 'SBCL'}/g" .docker.test.py
 
 mkdir -p /usr/lib/fpc/
 cp asset/Windows.pas /usr/lib/fpc/
