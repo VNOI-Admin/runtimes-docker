@@ -1,4 +1,4 @@
-FROM ubuntu:jammy
+FROM ubuntu:jammy AS base
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
@@ -26,17 +26,34 @@ RUN if [ "$(arch)" = x86_64 ]; then DEB_ARCH=amd64; else DEB_ARCH=arm64; fi && \
     curl -L -O $GCC_FILES_URL/libtsan0_11.3.0-1ubuntu1~22.04_$DEB_ARCH.deb && \
     dpkg -i *.deb && rm *.deb
 
-RUN if [ "$(arch)" = x86_64 ]; then PYPY_ARCH=linux64; else PYPY_ARCH="$(arch)"; fi && \
-    mkdir /opt/pypy3 && curl -L "https://downloads.python.org/pypy/pypy3.9-v7.3.10-$PYPY_ARCH.tar.bz2" | \
-        tar xj -C /opt/pypy3 --strip-components=1 && /opt/pypy3/bin/pypy -mcompileall && \
-    rm -f /opt/pypy3/bin/python*
-
 RUN curl -L -okotlin.zip https://github.com/JetBrains/kotlin/releases/download/v1.7.21/kotlin-compiler-1.7.21.zip && \
     unzip kotlin.zip && mv kotlinc /opt/kotlin && rm kotlin.zip
 
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* && \
     useradd -m judge
 
-ENV PATH="/opt/kotlin/bin:/opt/pypy3/bin:${PATH}"
+FROM base AS build
+
+RUN apt-get update && apt-get install -y dpkg-dev devscripts equivs
+
+RUN mkdir /build-pypy3 && \
+    cd /build-pypy3 && \
+    curl -L -O https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/pypy3/7.3.10+dfsg-1/pypy3_7.3.10+dfsg-1.dsc && \
+    curl -L -O https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/pypy3/7.3.10+dfsg-1/pypy3_7.3.10+dfsg.orig-cpython27.tar.xz && \
+    curl -L -O https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/pypy3/7.3.10+dfsg-1/pypy3_7.3.10+dfsg.orig.tar.xz && \
+    curl -L -O https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/pypy3/7.3.10+dfsg-1/pypy3_7.3.10+dfsg-1.debian.tar.xz && \
+    dpkg-source -x pypy3_7.3.10+dfsg-1.dsc && \
+    cd pypy3-7.3.10+dfsg && \
+    mk-build-deps && apt-get install -y ./pypy3-build-deps_7.3.10+dfsg-1_all.deb && \
+    dpkg-buildpackage -us -uc -b
+
+FROM base AS main
+
+COPY --from=build /build-pypy3/pypy3-lib_7.3.10+dfsg-1_amd64.deb pypy3-lib_7.3.10+dfsg-1_amd64.deb
+COPY --from=build /build-pypy3/pypy3_7.3.10+dfsg-1_amd64.deb pypy3_7.3.10+dfsg-1_amd64.deb
+
+RUN dpkg -i pypy3-lib_7.3.10+dfsg-1_amd64.deb && dpkg -i pypy3_7.3.10+dfsg-1_amd64.deb && rm -rf *.deb
+
+ENV PATH="/opt/kotlin/bin:${PATH}"
 
 ENTRYPOINT ["/usr/bin/tini", "/code/run"]

@@ -35,6 +35,9 @@ jobs:
           docker push vnoj/runtimes-tiericpc:amd64-latest
           docker run -v "$(pwd)":/code mplatform/manifest-tool \
             --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD" \
+            push from-spec /code/tiericpc/manifest.yml
+          docker run -v "$(pwd)":/code mplatform/manifest-tool \
+            --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD" \
             push from-spec /code/tier1/manifest.yml
           docker run -v "$(pwd)":/code mplatform/manifest-tool \
             --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD" \
@@ -42,9 +45,6 @@ jobs:
           docker run -v "$(pwd)":/code mplatform/manifest-tool \
             --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD" \
             push from-spec /code/tier3/manifest.yml
-          docker run -v "$(pwd)":/code mplatform/manifest-tool \
-            --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD" \
-            push from-spec /code/tiericpc/manifest.yml
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
