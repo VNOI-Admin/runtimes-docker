@@ -35,11 +35,14 @@ RUN apt-get update && \
         rm -rf rust && \
     if [ "$(arch)" = x86_64 ]; then curl -fsS https://dlang.org/install.sh | bash -s dmd --path /opt/dlang \
         && mv /opt/dlang/dmd-*/* /opt/dlang && rmdir /opt/dlang/dmd-*; fi && \
-    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF && \
-    echo "deb https://download.mono-project.com/repo/debian stable-buster main" > \
-        /etc/apt/sources.list.d/mono-official-stable.list && \
-    curl https://dmoj.ca/dmoj-apt.key | apt-key add - && \
-    echo 'deb https://apt.dmoj.ca/ bullseye main' > /etc/apt/sources.list.d/dmoj.list && \
+    gpg --homedir /tmp --no-default-keyring --keyring mono-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 3FA7E0328081BFF6A14DA29AA6A19B38D3D831EF && \
+        gpg --homedir /tmp --no-default-keyring --keyring mono-keyring.gpg --export --output /usr/share/keyrings/mono-official-archive-keyring.gpg && \
+        echo "deb [signed-by=/usr/share/keyrings/mono-official-archive-keyring.gpg] https://download.mono-project.com/repo/debian stable-buster main" > \
+            /etc/apt/sources.list.d/mono-official-stable.list && \
+    curl -L -O https://dmoj.ca/dmoj-apt.key && \
+        gpg --homedir /tmp --no-default-keyring --keyring dmoj-keyring.gpg --import dmoj-apt.key && rm dmoj-apt.key && \
+        gpg --homedir /tmp --no-default-keyring --keyring dmoj-keyring.gpg --export --output /usr/share/keyrings/dmoj-keyring.gpg && \
+        echo 'deb [signed-by=/usr/share/keyrings/dmoj-keyring.gpg] https://apt.dmoj.ca/ bullseye main' > /etc/apt/sources.list.d/dmoj.list && \
     (echo 'Package: *'; echo 'Pin: origin download.mono-project.com'; echo 'Pin-Priority: 990') > /etc/apt/preferences.d/mono && \
     apt-get update && \
     dpkg-divert --package mono-roslyn --divert /usr/bin/chicken-csc --rename /usr/bin/csc && \
