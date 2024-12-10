@@ -3,7 +3,7 @@ FROM ubuntu:jammy AS base
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         curl file gcc g++ python3-full python3-pip python3-dev python3-setuptools python3-wheel cython3 libseccomp-dev bzip2 unzip \
-        tini ca-certificates-java openjdk-17-jdk-headless openjdk-17-jre-headless \
+        fp-compiler tini ca-certificates-java \
         $([ "$(arch)" = aarch64 ] && echo binutils-arm-linux-gnueabihf)
 
 RUN if [ "$(arch)" = x86_64 ]; then DEB_ARCH=amd64; else DEB_ARCH=arm64; fi && \
