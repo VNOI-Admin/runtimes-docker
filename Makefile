@@ -1,8 +1,11 @@
 TAG ?= latest
 
-.PHONY: all image-tier1 image-tier2 image-tier3 clean test-tier1 test-tier2 test-tier3
+.PHONY: all image-tiericpc image-tier1 image-tier2 image-tier3 clean test-tiericpc test-tier1 test-tier2 test-tier3
 
-all: image-tier1 image-tier2 image-tier3
+all: image-tiericpc image-tier1 image-tier2 image-tier3
+
+image-tiericpc:
+	cd tiericpc && docker build -t vnoj/runtimes-tiericpc -t vnoj/runtimes-tiericpc:$(TAG) -t ghcr.io/vnoj/runtimes-tiericpc:$(TAG) .
 
 image-tier1:
 	cd tier1 && docker build -t vnoj/runtimes-tier1 -t vnoj/runtimes-tier1:$(TAG) -t ghcr.io/vnoj/runtimes-tier1:$(TAG) .
@@ -24,7 +27,10 @@ clean:
 	-docker rmi vnoj/runtimes-tier1 vnoj/runtimes-tier1:$(TAG) ghcr.io/vnoj/runtimes-tier1:$(TAG)
 	docker builder prune -a -f
 
-test: test-tier1 test-tier2 test-tier3
+test: test-tiericpc test-tier1 test-tier2 test-tier3
+
+test-tiericpc:
+	docker run --rm -v "`pwd`/test":/code --cap-add=SYS_PTRACE vnoj/runtimes-tiericpc
 
 test-tier1:
 	docker run --rm -v "`pwd`/test":/code --cap-add=SYS_PTRACE vnoj/runtimes-tier1
