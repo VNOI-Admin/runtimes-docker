@@ -9,6 +9,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Build tier icpc Docker image
+        run: make TAG=amd64-latest image-tiericpc
+      - name: Test tier icpc Docker image
+        run: make TAG=amd64-latest test-tiericpc
       - name: Build tier 1 Docker image
         run: make TAG=amd64-latest image-tier1
       - name: Test tier 1 Docker image
@@ -25,9 +29,13 @@ jobs:
         if: (github.event_name == 'push' || github.event_name == 'schedule') && github.ref == 'refs/heads/master'
         run: |
           echo "$DOCKER_PASSWORD" | docker login --username "$DOCKER_USERNAME" --password-stdin
+          docker push vnoj/runtimes-tiericpc:amd64-latest
           docker push vnoj/runtimes-tier1:amd64-latest
           docker push vnoj/runtimes-tier2:amd64-latest
           docker push vnoj/runtimes-tier3:amd64-latest
+          docker run -v "$(pwd)":/code mplatform/manifest-tool \
+            --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD" \
+            push from-spec /code/tiericpc/manifest.yml
           docker run -v "$(pwd)":/code mplatform/manifest-tool \
             --username="$DOCKER_USERNAME" --password="$DOCKER_PASSWORD" \
             push from-spec /code/tier1/manifest.yml
