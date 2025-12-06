@@ -1,0 +1,12 @@
+image: vnoj/runtimes-tiericpc:latest
+manifests:
+  -
+    image: vnoj/runtimes-tiericpc:amd64-latest
+    platform:
+      architecture: amd64
+      os: linux
+  -
+    image: vnoj/runtimes-tiericpc:aarch64-latest
+    platform:
+      architecture: arm64
+      os: linux
