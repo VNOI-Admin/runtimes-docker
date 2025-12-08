@@ -4,6 +4,9 @@ TAG ?= latest
 
 all: image-tiericpc image-tier1 image-tier2 image-tier3
 
+image-tiercuda:
+	cd tiercuda && docker build -t vnoj/runtimes-tiercuda -t vnoj/runtimes-tiercuda:$(TAG) -t ghcr.io/vnoj/runtimes-tiercuda:$(TAG) .
+
 image-tiericpc:
 	cd tiericpc && docker build -t vnoj/runtimes-tiericpc -t vnoj/runtimes-tiericpc:$(TAG) -t ghcr.io/vnoj/runtimes-tiericpc:$(TAG) .
 
