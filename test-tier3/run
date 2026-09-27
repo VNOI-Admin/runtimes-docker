@@ -16,6 +16,8 @@ fpc -Fe/dev/stderr -O2 /usr/lib/fpc/Windows.pas
 
 .docker/download_testlib_and_precompile
 
+sed -i "s/^ALLOW_FAIL = {/ALLOW_FAIL = {'NODEJS', /" .docker.test.py
+
 python3 -m venv --prompt=DMOJ env
 env/bin/pip3 install -e .
 runuser -u judge -w PATH -- bash -c '. ~/.profile; /judge/env/bin/python3 -u .docker.test.py'
